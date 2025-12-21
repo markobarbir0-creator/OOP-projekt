@@ -1,0 +1,52 @@
+#include <SFML/Graphics.hpp>
+#include <vector>
+using namespace std;
+using namespace sf;
+class Board {
+private:
+    vector<vector<int>> grid;
+    RectangleShape Boardshape;
+public:
+    const int rows = 6;
+    const int colums = 7;
+    Board() {
+        grid.resize(rows, vector<int> (colums,0));
+        Boardshape.setSize(Vector2f(800.f, 700.f));
+        Boardshape.setFillColor(Color::Blue);
+    }
+    void draw(RenderWindow& window) {
+        window.draw(Boardshape);
+        for (auto i = 0; i < rows; i++) {
+            for (auto j = 0; j < colums; j++) {
+                CircleShape krug(45.f);
+                krug.setFillColor(Color::White);
+                float X = j * (800 / 7) + 10.f;
+                float Y = i * (700 / 6) + 10.f;
+                krug.setPosition(X, Y);
+                window.draw(krug);
+            }
+        }
+    }
+
+};
+
+int main() {
+    RenderWindow window(VideoMode(800, 700), "Connect Four - Faza 1");
+
+    Board board;
+
+    while (window.isOpen()) {
+        Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed)
+                window.close();
+        }
+
+        window.clear(Color::White);
+        board.draw(window);
+        window.display();
+    }
+   
+
+    return 0;
+}
