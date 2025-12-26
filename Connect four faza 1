@@ -22,29 +22,41 @@ public:
         for (auto i = 0; i < rows; i++) {
             for (auto j = 0; j < colums; j++) {
                 CircleShape krug(45.f);
-                krug.setFillColor(Color::White);
                 float X = j * CELL_WIDTH + 10.f;
                 float Y = i * CELL_HEIGHT + 10.f;
                 krug.setPosition(X, Y);
-                window.draw(krug);
+                if (grid[i][j] == 0) {
+                    krug.setFillColor(Color::White);
+                    window.draw(krug);
+                }
+                else if (grid[i][j] == 1) {
+                    krug.setFillColor(Color::Yellow);
+                    window.draw(krug);
+                }
+                else if (grid[i][j] == 2) {
+                    krug.setFillColor(Color::Red);
+                    window.draw(krug);
+                }
+                
             }
         }
+        
     }
     bool jelipun(int stupac) {
         return grid[0][stupac] != 0;
     }
-bool dodajzeton(int stupac,int igrac) {
-    if (stupac<0||stupac>=colums){
-        return false;
-}    
-    for (int i=rows-1;i>=0;i--){
-        if (grid[i][stupac]==0) {
-            grid[i][stupac]=igrac;
-            return true;
+    bool dodajzeton(int stupac, int igrac) {
+        if (stupac < 0 || stupac >= colums) {
+            return false;
         }
+        for (int i = rows - 1; i >= 0; i--) {
+            if (grid[i][stupac] == 0) {
+                grid[i][stupac] = igrac;
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
-}
 
 };
 class Game{
@@ -59,10 +71,18 @@ public:
     int getcurrentplayer() {
         return currentplayer;
     }
+    Board& getboard() {
+        return board;
+    }
     
     void handleclick(int x) {
         int stupac = x / CELL_WIDTH;
-        
+        if ((stupac >= 0) && (stupac < 7)) {
+            if (!board.jelipun(stupac)) {
+                board.dodajzeton(stupac, currentplayer);
+                currentplayer = (currentplayer == 1 ? 2 : 1);
+            }
+        }
     }
 
 };
@@ -71,6 +91,7 @@ int main() {
     RenderWindow window(VideoMode(800, 700), "Connect Four - Faza 1");
 
     Board board;
+    Game game;
     
     
 
@@ -79,12 +100,16 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
+            if (event.type == Event::MouseButtonPressed)
+                game.handleclick(event.mouseButton.x);
         }
 
         window.clear(Color::White);
-        board.draw(window);
+        game.getboard().draw(window);
         window.display();
+
     }
+    
    
 
     return 0;
