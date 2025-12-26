@@ -33,6 +33,18 @@ public:
     bool jelipun(int stupac) {
         return grid[0][stupac] != 0;
     }
+bool dodajzeton(int stupac,int igrac) {
+    if (stupac<0||stupac>=colums){
+        return false;
+}    
+    for (int i=rows-1;i>=0;i--){
+        if (grid[i][stupac]==0) {
+            grid[i][stupac]=igrac;
+            return true;
+        }
+    }
+    return false;
+}
 
 };
 class Game{
