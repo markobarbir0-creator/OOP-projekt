@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <cstdlib>
 using namespace std;
 using namespace sf;
 class Board {
@@ -28,6 +29,15 @@ public:
         }
     }
 
+};
+class Game {
+private:
+    Board board;
+    int currentplayer;
+public:
+    Game(){
+        currentplayer = rand() % 2 + 1;
+    }
 };
 
 int main() {
