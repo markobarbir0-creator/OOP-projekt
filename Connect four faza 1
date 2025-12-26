@@ -3,6 +3,8 @@
 #include <cstdlib>
 using namespace std;
 using namespace sf;
+const float CELL_WIDTH = 800.0f / 7;
+const float CELL_HEIGHT = 700.0f / 6;
 class Board {
 private:
     vector<vector<int>> grid;
@@ -21,29 +23,44 @@ public:
             for (auto j = 0; j < colums; j++) {
                 CircleShape krug(45.f);
                 krug.setFillColor(Color::White);
-                float X = j * (800 / 7) + 10.f;
-                float Y = i * (700 / 6) + 10.f;
+                float X = j * CELL_WIDTH + 10.f;
+                float Y = i * CELL_HEIGHT + 10.f;
                 krug.setPosition(X, Y);
                 window.draw(krug);
             }
         }
     }
+    bool jelipun(int stupac) {
+        return grid[0][stupac] != 0;
+    }
 
 };
-class Game {
+class Game{
 private:
     Board board;
     int currentplayer;
+
 public:
     Game(){
         currentplayer = rand() % 2 + 1;
     }
+    int getcurrentplayer() {
+        return currentplayer;
+    }
+    
+    void handleclick(int x) {
+        int stupac = x / CELL_WIDTH;
+        
+    }
+
 };
 
 int main() {
     RenderWindow window(VideoMode(800, 700), "Connect Four - Faza 1");
 
     Board board;
+    
+    
 
     while (window.isOpen()) {
         Event event;
