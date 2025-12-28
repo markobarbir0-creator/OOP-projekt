@@ -4,9 +4,18 @@
 #include <cstdlib>
 using namespace std;
 using namespace sf;
+
 const float CELL_WIDTH = 800.0f / 7;
 const float CELL_HEIGHT = 700.0f / 6;
 const float PADDING = 10.f;
+
+class Player {
+public:
+    int id;
+    string name;
+    Player(int i = 0) : id(i) {}
+};
+
 class Board {
 private:
     vector<vector<int>> grid;
@@ -39,16 +48,16 @@ public:
                     krug.setFillColor(Color::Red);
                     window.draw(krug);
                 }
-                
+
             }
         }
-        
+
     }
     bool jelipun(int stupac) {
         return grid[0][stupac] != 0;
     }
     bool dodajzeton(int stupac, int igrac,int &red) {
-        
+
         if (stupac < 0 || stupac >= columns) {
             return false;
         }
@@ -83,6 +92,7 @@ public:
                 brojac = 0;
             }    
         }
+        brojac = 0;
         for (int j = 0; j <columns; j++) {
             if (grid[red][j] == igrac) {
                 brojac++;
@@ -123,9 +133,11 @@ public:
 
 
 };
+
 class Game{
 private:
     Board board;
+    Player p1, p2;
     int currentplayer;
     int stupac;
     int red;
@@ -139,7 +151,17 @@ private:
 
 public:
     Game(){
+        p1.id = 1;
+        p2.id = 2;
+        cout << "Unesi ime igraca 1: ";
+        cin >> p1.name;
+        cout << "Unesi ime igraca 2: ";
+        cin >> p2.name;
         currentplayer = rand() % 2 + 1;
+        cout << "Na redu je: " << trenutniigrac() << endl;
+    }
+    string trenutniigrac() {
+        return (currentplayer == 1) ? p1.name : p2.name;
     }
     int getcurrentplayer() {
         return currentplayer;
@@ -175,10 +197,12 @@ public:
                 board.postavizeton(animred, animstupac, animigrac);
                 pada = false;
                 if (board.provjerapobjede(animigrac, animstupac, animred)) {
-                    cout << "Igrac " << animigrac << " je pobijedio" << endl;
+                    cout << "Pobijedio je: " 
+                         << ((animigrac == 1) ? p1.name : p2.name) << endl;
                 }
                 else {
                     currentplayer = (currentplayer == 1) ? 2 : 1;
+                    cout << "Na redu je: " << trenutniigrac() << endl;
                 }
                 
             }
