@@ -4,18 +4,16 @@
 #include <cstdlib>
 using namespace std;
 using namespace sf;
-
 const float CELL_WIDTH = 800.0f / 7;
 const float CELL_HEIGHT = 700.0f / 6;
 const float PADDING = 10.f;
-
 class Player {
 public:
     int id;
     string name;
     Player(int i = 0) : id(i) {}
+    
 };
-
 class Board {
 private:
     vector<vector<int>> grid;
@@ -48,16 +46,16 @@ public:
                     krug.setFillColor(Color::Red);
                     window.draw(krug);
                 }
-
+                
             }
         }
-
+        
     }
     bool jelipun(int stupac) {
         return grid[0][stupac] != 0;
     }
     bool dodajzeton(int stupac, int igrac,int &red) {
-
+        
         if (stupac < 0 || stupac >= columns) {
             return false;
         }
@@ -92,7 +90,6 @@ public:
                 brojac = 0;
             }    
         }
-        brojac = 0;
         for (int j = 0; j <columns; j++) {
             if (grid[red][j] == igrac) {
                 brojac++;
@@ -133,12 +130,11 @@ public:
 
 
 };
-
 class Game{
 private:
     Board board;
-    Player p1, p2;
     int currentplayer;
+    Player p1, p2;
     int stupac;
     int red;
     int igrac;
@@ -148,6 +144,8 @@ private:
     float animY;
     int animigrac;
     float brzina = CELL_HEIGHT / (0.5 * 60);//cellh/(vrijemepada u sekundama*fps)
+    bool igragotova;
+    int pobjednik;
 
 public:
     Game(){
@@ -158,11 +156,9 @@ public:
         cout << "Unesi ime igraca 2: ";
         cin >> p2.name;
         currentplayer = rand() % 2 + 1;
-        cout << "Na redu je: " << trenutniigrac() << endl;
+        
     }
-    string trenutniigrac() {
-        return (currentplayer == 1) ? p1.name : p2.name;
-    }
+   
     int getcurrentplayer() {
         return currentplayer;
     }
@@ -197,12 +193,11 @@ public:
                 board.postavizeton(animred, animstupac, animigrac);
                 pada = false;
                 if (board.provjerapobjede(animigrac, animstupac, animred)) {
-                    cout << "Pobijedio je: " 
-                         << ((animigrac == 1) ? p1.name : p2.name) << endl;
+                    igragotova = true;
+                    pobjednik = animigrac;
                 }
                 else {
                     currentplayer = (currentplayer == 1) ? 2 : 1;
-                    cout << "Na redu je: " << trenutniigrac() << endl;
                 }
                 
             }
@@ -221,6 +216,29 @@ public:
                 animkrug.setFillColor(Color::Red);
             }
             w.draw(animkrug);
+        }
+        if (igragotova) {
+            Font font;
+            font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+            if (pobjednik == 1) {
+                Text tekst;
+                tekst.setFont(font);
+                tekst.setString(p1.name +" JE POBIJEDIO");
+                tekst.setCharacterSize(50);
+                tekst.setFillColor(Color::Yellow);
+                tekst.setPosition(800/ 2, 700/ 2);
+                w.draw(tekst);
+            }
+            else if (pobjednik == 2) {
+                Text tekst;
+                tekst.setFont(font);
+                tekst.setString(p2.name+" JE POBIJEDIO");
+                tekst.setCharacterSize(50);
+                tekst.setFillColor(Color::Red);
+                tekst.setPosition(400/2, 350/2);
+                w.draw(tekst);
+            }
+
         }
     }
 
@@ -246,8 +264,10 @@ int main() {
         }
         game.update();
         window.clear(Color::White);
+        
         game.getboard().draw(window);
         game.gamedraw(window);
+        
        
        
         window.display();
