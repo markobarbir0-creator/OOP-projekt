@@ -6,6 +6,7 @@ using namespace std;
 using namespace sf;
 const float CELL_WIDTH = 800.0f / 7;
 const float CELL_HEIGHT = 700.0f / 6;
+const float PADDING = 10.f;
 class Board {
 private:
     vector<vector<int>> grid;
@@ -23,8 +24,8 @@ public:
         for (auto i = 0; i < rows; i++) {
             for (auto j = 0; j < columns; j++) {
                 CircleShape krug(45.f);
-                float X = j * CELL_WIDTH + 10.f;
-                float Y = i * CELL_HEIGHT + 10.f;
+                float X = j * CELL_WIDTH + PADDING;
+                float Y = i * CELL_HEIGHT + PADDING;
                 krug.setPosition(X, Y);
                 if (grid[i][j] == 0) {
                     krug.setFillColor(Color::White);
@@ -54,6 +55,15 @@ public:
         for (int i = rows - 1; i >= 0; i--) {
             if (grid[i][stupac] == 0) {
                 grid[i][stupac] = igrac;
+                red = i;
+                return true;
+            }
+        }
+        return false;
+    }
+    bool pronadired(int stupac, int &red) {
+        for (int i = rows - 1; i >= 0; i--) {
+            if (grid[i][stupac] == 0) {
                 red = i;
                 return true;
             }
@@ -94,15 +104,38 @@ public:
                 if (brojacgd == 4) return true;
             }
         }
+        for (int i = 0; i <= rows - 4; i++) {
+            for (int j = 3; j < columns; j++) {
+                int brojacdg = 0;
+                for (int k = 0; k < 4; k++) {
+                    if (grid[i + k][j - k] == igrac) brojacdg++;
+                    else break;
+                }
+                if (brojacdg == 4) return true;
+            }
+        }
 
         return false;
     }
+    void postavizeton(int red, int stupac, int igrac) {
+        grid[red][stupac] = igrac;
+    }
+
 
 };
 class Game{
 private:
     Board board;
     int currentplayer;
+    int stupac;
+    int red;
+    int igrac;
+    bool pada;
+    int animstupac;
+    int animred;
+    float animY;
+    int animigrac;
+    float brzina = CELL_HEIGHT / (0.5 * 60);//cellh/(vrijemepada u sekundama*fps)
 
 public:
     Game(){
@@ -114,18 +147,56 @@ public:
     Board& getboard() {
         return board;
     }
+
+    
     
     void handleclick(int x) {
-        int stupac = x / CELL_WIDTH;
-        int red;
+         stupac = x / CELL_WIDTH;
         if ((stupac >= 0) && (stupac < 7)) {
-            if (!board.jelipun(stupac)) {
-                board.dodajzeton(stupac, currentplayer,red);
-                if (board.provjerapobjede(currentplayer, stupac,red)) {
-                    cout << "Igrac " << currentplayer << " je pobjedio" << endl;
-                }
-                currentplayer = (currentplayer == 1 ? 2 : 1);
+            if ((!board.jelipun(stupac))&&(!pada)) {
+                board.pronadired(stupac, red);
+                pada = true;
+                animstupac = stupac;
+                animred = red;
+                animigrac = currentplayer;
+                animY = 0;
+                
             }
+        }
+    }
+    void update() {
+        int ciljaniY = animred * CELL_HEIGHT + PADDING;
+        if (pada) {
+            if (animY < ciljaniY) {
+                animY += brzina;
+            }
+            else {
+                animY = ciljaniY;
+                board.postavizeton(animred, animstupac, animigrac);
+                pada = false;
+                if (board.provjerapobjede(animigrac, animstupac, animred)) {
+                    cout << "Igrac " << animigrac << " je pobijedio" << endl;
+                }
+                else {
+                    currentplayer = (currentplayer == 1) ? 2 : 1;
+                }
+                
+            }
+        }
+    }
+    void gamedraw(RenderWindow& w) {
+        if (pada) {
+            CircleShape animkrug(45.f);
+            float X = animstupac * CELL_WIDTH + PADDING;
+            float Y = animY;
+            animkrug.setPosition(X, Y);
+            if (animigrac == 1) {
+                animkrug.setFillColor(Color::Yellow);
+            }
+            else if (animigrac == 2) {
+                animkrug.setFillColor(Color::Red);
+            }
+            w.draw(animkrug);
         }
     }
 
@@ -149,9 +220,12 @@ int main() {
             if (event.type == Event::MouseButtonPressed)
                 game.handleclick(event.mouseButton.x);
         }
-
+        game.update();
         window.clear(Color::White);
         game.getboard().draw(window);
+        game.gamedraw(window);
+       
+       
         window.display();
 
     }
