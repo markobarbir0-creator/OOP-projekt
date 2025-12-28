@@ -2,18 +2,21 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+
 using namespace std;
 using namespace sf;
+
 const float CELL_WIDTH = 800.0f / 7;
 const float CELL_HEIGHT = 700.0f / 6;
 const float PADDING = 10.f;
+
 class Player {
 public:
     int id;
     string name;
     Player(int i = 0) : id(i) {}
-    
 };
+
 class Board {
 private:
     vector<vector<int>> grid;
@@ -21,54 +24,36 @@ private:
 public:
     const int rows = 6;
     const int columns = 7;
+
     Board() {
-        grid.resize(rows, vector<int> (columns,0));
+        grid.resize(rows, vector<int>(columns, 0));
         Boardshape.setSize(Vector2f(800.f, 700.f));
         Boardshape.setFillColor(Color::Blue);
     }
+
     void draw(RenderWindow& window) {
         window.draw(Boardshape);
-        for (auto i = 0; i < rows; i++) {
-            for (auto j = 0; j < columns; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
                 CircleShape krug(45.f);
                 float X = j * CELL_WIDTH + PADDING;
                 float Y = i * CELL_HEIGHT + PADDING;
                 krug.setPosition(X, Y);
-                if (grid[i][j] == 0) {
-                    krug.setFillColor(Color::White);
-                    window.draw(krug);
-                }
-                else if (grid[i][j] == 1) {
-                    krug.setFillColor(Color::Yellow);
-                    window.draw(krug);
-                }
-                else if (grid[i][j] == 2) {
-                    krug.setFillColor(Color::Red);
-                    window.draw(krug);
-                }
-                
+
+                if (grid[i][j] == 0) krug.setFillColor(Color::White);
+                else if (grid[i][j] == 1) krug.setFillColor(Color::Yellow);
+                else krug.setFillColor(Color::Red);
+
+                window.draw(krug);
             }
         }
-        
     }
+
     bool jelipun(int stupac) {
         return grid[0][stupac] != 0;
     }
-    bool dodajzeton(int stupac, int igrac,int &red) {
-        
-        if (stupac < 0 || stupac >= columns) {
-            return false;
-        }
-        for (int i = rows - 1; i >= 0; i--) {
-            if (grid[i][stupac] == 0) {
-                grid[i][stupac] = igrac;
-                red = i;
-                return true;
-            }
-        }
-        return false;
-    }
-    bool pronadired(int stupac, int &red) {
+
+    bool pronadired(int stupac, int& red) {
         for (int i = rows - 1; i >= 0; i--) {
             if (grid[i][stupac] == 0) {
                 red = i;
@@ -77,121 +62,180 @@ public:
         }
         return false;
     }
-    bool provjerapobjede(int igrac,int stupac,int red) {
+
+    bool provjerapobjede(int igrac, int stupac, int red) {
         int brojac = 0;
-        for (int i = rows - 1; i >= 0; i--) { 
-            if (grid[i][stupac] == igrac) {
-                brojac++;
-                if (brojac == 4) {
+
+        for (int i = 0; i < rows; i++) {
+            brojac = (grid[i][stupac] == igrac) ? brojac + 1 : 0;
+            if (brojac == 4) return true;
+        }
+
+        brojac = 0;
+        for (int j = 0; j < columns; j++) {
+            brojac = (grid[red][j] == igrac) ? brojac + 1 : 0;
+            if (brojac == 4) return true;
+        }
+
+        for (int i = 0; i <= rows - 4; i++)
+            for (int j = 0; j <= columns - 4; j++)
+                if (grid[i][j] == igrac && grid[i + 1][j + 1] == igrac &&
+                    grid[i + 2][j + 2] == igrac && grid[i + 3][j + 3] == igrac)
                     return true;
-                }
-            }
-            else {
-                brojac = 0;
-            }    
-        }
-        for (int j = 0; j <columns; j++) {
-            if (grid[red][j] == igrac) {
-                brojac++;
-                if (brojac == 4) {
+
+        for (int i = 0; i <= rows - 4; i++)
+            for (int j = 3; j < columns; j++)
+                if (grid[i][j] == igrac && grid[i + 1][j - 1] == igrac &&
+                    grid[i + 2][j - 2] == igrac && grid[i + 3][j - 3] == igrac)
                     return true;
-                }
-            }
-            else {
-                brojac = 0;
-            }
-        }
-        for (int i = 0; i <= rows - 4; i++) {
-            for (int j = 0; j <= columns - 4; j++) {
-                int brojacgd = 0;
-                for (int k = 0; k < 4; k++) {
-                    if (grid[i + k][j + k] == igrac) brojacgd++;
-                    else break;
-                }
-                if (brojacgd == 4) return true;
-            }
-        }
-        for (int i = 0; i <= rows - 4; i++) {
-            for (int j = 3; j < columns; j++) {
-                int brojacdg = 0;
-                for (int k = 0; k < 4; k++) {
-                    if (grid[i + k][j - k] == igrac) brojacdg++;
-                    else break;
-                }
-                if (brojacdg == 4) return true;
-            }
-        }
 
         return false;
     }
+
     void postavizeton(int red, int stupac, int igrac) {
         grid[red][stupac] = igrac;
     }
-
-
 };
-class Game{
+
+enum StanjeIgre {
+    izbornik,
+    DvaIgraca,
+    JedanIgrac
+};
+
+class Game {
 private:
     Board board;
-    int currentplayer;
     Player p1, p2;
-    int stupac;
-    int red;
-    int igrac;
-    bool pada;
-    int animstupac;
-    int animred;
+    int currentplayer;
+    int stupac, red;
+    bool pada = false;
+    int animstupac, animred, animigrac;
     float animY;
-    int animigrac;
-    float brzina = CELL_HEIGHT / (0.5 * 60);//cellh/(vrijemepada u sekundama*fps)
-    bool igragotova;
+    float brzina = CELL_HEIGHT / (0.5f * 60);
+    bool igragotova = false;
     int pobjednik;
 
+    StanjeIgre stanjeIgre;
+
+    RectangleShape gumbDvaIgraca;
+    RectangleShape gumbRacunalo;
+    Font font;
+    Text naslov;
+    Text tekstDvaIgraca;
+    Text tekstRacunalo;
+
+    int procijeniPotez(int stupac, int igrac) {
+        int r;
+        if (!board.pronadired(stupac, r)) return -1000;
+        int bodovi = abs(3 - stupac);
+        if (board.provjerapobjede(igrac, stupac, r)) bodovi += 1000;
+        return bodovi;
+    }
+
+    int najboljiPotezRacunala() {
+        int najbolji = -10000;
+        int najboljiStupac = 0;
+
+        for (int j = 0; j < 7; j++) {
+            if (!board.jelipun(j)) {
+                int b = procijeniPotez(j, 2);
+                if (b > najbolji) {
+                    najbolji = b;
+                    najboljiStupac = j;
+                }
+            }
+        }
+        return najboljiStupac;
+    }
+
 public:
-    Game(){
+    Game() {
+        stanjeIgre = izbornik;
+
         p1.id = 1;
         p2.id = 2;
-        cout << "Unesi ime igraca 1: ";
-        cin >> p1.name;
-        cout << "Unesi ime igraca 2: ";
-        cin >> p2.name;
+
         currentplayer = rand() % 2 + 1;
-        
+
+        font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+
+        naslov.setFont(font);
+        naslov.setString("CONNECT 4");
+        naslov.setCharacterSize(60);
+        naslov.setPosition(250, 100);
+
+        gumbDvaIgraca.setSize(Vector2f(300, 80));
+        gumbDvaIgraca.setPosition(250, 250);
+        gumbDvaIgraca.setFillColor(Color::Green);
+
+        gumbRacunalo.setSize(Vector2f(300, 80));
+        gumbRacunalo.setPosition(250, 360);
+        gumbRacunalo.setFillColor(Color::Red);
+
+        tekstDvaIgraca.setFont(font);
+        tekstDvaIgraca.setString("2 IGRAČA");
+        tekstDvaIgraca.setCharacterSize(40);
+        tekstDvaIgraca.setPosition(330, 265);
+
+        tekstRacunalo.setFont(font);
+        tekstRacunalo.setString("1 IGRAČ");
+        tekstRacunalo.setCharacterSize(40);
+        tekstRacunalo.setPosition(350, 375);
     }
-   
-    int getcurrentplayer() {
-        return currentplayer;
+
+    bool jeIzbornik() {
+        return stanjeIgre == izbornik;
     }
+
+    void obradiKlikIzbornika(Vector2i mis) {
+        if (gumbDvaIgraca.getGlobalBounds().contains(mis.x, mis.y)) {
+            stanjeIgre = DvaIgraca;
+            cout << "Unesi ime igraca 1: ";
+            cin >> p1.name;
+            cout << "Unesi ime igraca 2: ";
+            cin >> p2.name;
+        }
+        else if (gumbRacunalo.getGlobalBounds().contains(mis.x, mis.y)) {
+            stanjeIgre = JedanIgrac;
+            cout << "Unesi ime igraca: ";
+            cin >> p1.name;
+            p2.name = "BOT1";
+        }
+    }
+
     Board& getboard() {
         return board;
     }
 
-    
-    
     void handleclick(int x) {
-         stupac = x / CELL_WIDTH;
-        if ((stupac >= 0) && (stupac < 7)) {
-            if ((!board.jelipun(stupac))&&(!pada)) {
-                board.pronadired(stupac, red);
-                pada = true;
-                animstupac = stupac;
-                animred = red;
-                animigrac = currentplayer;
-                animY = 0;
-                
-            }
+        if (stanjeIgre == izbornik) return;
+
+        stupac = x / CELL_WIDTH;
+        if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac) && !pada) {
+            board.pronadired(stupac, red);
+            pada = true;
+            animstupac = stupac;
+            animred = red;
+            animigrac = currentplayer;
+            animY = 0;
         }
     }
+
     void update() {
+        if (stanjeIgre == JedanIgrac && currentplayer == 2 && !pada && !igragotova) {
+            int s = najboljiPotezRacunala();
+            handleclick(s * CELL_WIDTH);
+        }
+
         int ciljaniY = animred * CELL_HEIGHT + PADDING;
         if (pada) {
-            if (animY < ciljaniY) {
-                animY += brzina;
-            }
+            if (animY < ciljaniY) animY += brzina;
             else {
                 animY = ciljaniY;
                 board.postavizeton(animred, animstupac, animigrac);
                 pada = false;
+
                 if (board.provjerapobjede(animigrac, animstupac, animred)) {
                     igragotova = true;
                     pobjednik = animigrac;
@@ -199,82 +243,57 @@ public:
                 else {
                     currentplayer = (currentplayer == 1) ? 2 : 1;
                 }
-                
             }
         }
     }
+
     void gamedraw(RenderWindow& w) {
+        if (stanjeIgre == izbornik) {
+            w.draw(naslov);
+            w.draw(gumbDvaIgraca);
+            w.draw(gumbRacunalo);
+            w.draw(tekstDvaIgraca);
+            w.draw(tekstRacunalo);
+            return;
+        }
+
         if (pada) {
             CircleShape animkrug(45.f);
-            float X = animstupac * CELL_WIDTH + PADDING;
-            float Y = animY;
-            animkrug.setPosition(X, Y);
-            if (animigrac == 1) {
-                animkrug.setFillColor(Color::Yellow);
-            }
-            else if (animigrac == 2) {
-                animkrug.setFillColor(Color::Red);
-            }
+            animkrug.setPosition(animstupac * CELL_WIDTH + PADDING, animY);
+            animkrug.setFillColor(animigrac == 1 ? Color::Yellow : Color::Red);
             w.draw(animkrug);
         }
-        if (igragotova) {
-            Font font;
-            font.loadFromFile("C:/Windows/Fonts/arial.ttf");
-            if (pobjednik == 1) {
-                Text tekst;
-                tekst.setFont(font);
-                tekst.setString(p1.name +" JE POBIJEDIO");
-                tekst.setCharacterSize(50);
-                tekst.setFillColor(Color::Yellow);
-                tekst.setPosition(800/ 2, 700/ 2);
-                w.draw(tekst);
-            }
-            else if (pobjednik == 2) {
-                Text tekst;
-                tekst.setFont(font);
-                tekst.setString(p2.name+" JE POBIJEDIO");
-                tekst.setCharacterSize(50);
-                tekst.setFillColor(Color::Red);
-                tekst.setPosition(400/2, 350/2);
-                w.draw(tekst);
-            }
-
-        }
     }
-
 };
 
 int main() {
-    RenderWindow window(VideoMode(800, 700), "Connect Four - Faza 1");
+    RenderWindow window(VideoMode(800, 700), "Connect Four");
     window.setFramerateLimit(60);
 
-
-    Board board;
     Game game;
-    
-    
 
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed)
                 window.close();
-            if (event.type == Event::MouseButtonPressed)
-                game.handleclick(event.mouseButton.x);
+
+            if (event.type == Event::MouseButtonPressed) {
+                if (game.jeIzbornik())
+                    game.obradiKlikIzbornika(Mouse::getPosition(window));
+                else
+                    game.handleclick(event.mouseButton.x);
+            }
         }
+
         game.update();
+
         window.clear(Color::White);
-        
         game.getboard().draw(window);
         game.gamedraw(window);
-        
-       
-       
         window.display();
-
     }
-    
-   
 
     return 0;
 }
+
