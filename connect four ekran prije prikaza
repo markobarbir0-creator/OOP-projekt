@@ -1,0 +1,299 @@
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+using namespace sf;
+
+const float CELL_WIDTH = 800.0f / 7;
+const float CELL_HEIGHT = 700.0f / 6;
+const float PADDING = 10.f;
+
+class Player {
+public:
+    int id;
+    string name;
+    Player(int i = 0) : id(i) {}
+};
+
+class Board {
+private:
+    vector<vector<int>> grid;
+    RectangleShape Boardshape;
+public:
+    const int rows = 6;
+    const int columns = 7;
+
+    Board() {
+        grid.resize(rows, vector<int>(columns, 0));
+        Boardshape.setSize(Vector2f(800.f, 700.f));
+        Boardshape.setFillColor(Color::Blue);
+    }
+
+    void draw(RenderWindow& window) {
+        window.draw(Boardshape);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                CircleShape krug(45.f);
+                krug.setPosition(j * CELL_WIDTH + PADDING, i * CELL_HEIGHT + PADDING);
+
+                if (grid[i][j] == 0) krug.setFillColor(Color::White);
+                else if (grid[i][j] == 1) krug.setFillColor(Color::Yellow);
+                else krug.setFillColor(Color::Red);
+
+                window.draw(krug);
+            }
+        }
+    }
+
+    bool jelipun(int stupac) {
+        return grid[0][stupac] != 0;
+    }
+
+    bool pronadired(int stupac, int& red) {
+        for (int i = rows - 1; i >= 0; i--) {
+            if (grid[i][stupac] == 0) {
+                red = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool provjerapobjede(int igrac, int stupac, int red) {
+        int brojac = 0;
+
+        for (int i = 0; i < rows; i++) {
+            brojac = (grid[i][stupac] == igrac) ? brojac + 1 : 0;
+            if (brojac == 4) return true;
+        }
+
+        brojac = 0;
+        for (int j = 0; j < columns; j++) {
+            brojac = (grid[red][j] == igrac) ? brojac + 1 : 0;
+            if (brojac == 4) return true;
+        }
+
+        for (int i = 0; i <= rows - 4; i++)
+            for (int j = 0; j <= columns - 4; j++)
+                if (grid[i][j] == igrac && grid[i + 1][j + 1] == igrac &&
+                    grid[i + 2][j + 2] == igrac && grid[i + 3][j + 3] == igrac)
+                    return true;
+
+        for (int i = 0; i <= rows - 4; i++)
+            for (int j = 3; j < columns; j++)
+                if (grid[i][j] == igrac && grid[i + 1][j - 1] == igrac &&
+                    grid[i + 2][j - 2] == igrac && grid[i + 3][j - 3] == igrac)
+                    return true;
+
+        return false;
+    }
+
+    void postavizeton(int red, int stupac, int igrac) {
+        grid[red][stupac] = igrac;
+    }
+};
+
+enum StanjeIgre {
+    izbornik,
+    DvaIgraca,
+    JedanIgrac
+};
+
+class Game {
+private:
+    Board board;
+    Player p1, p2;
+    int currentplayer;
+    int stupac, red;
+    bool pada = false;
+    int animstupac, animred, animigrac;
+    float animY;
+    float brzina = CELL_HEIGHT / (0.5f * 60);
+    bool igragotova = false;
+    int pobjednik;
+    bool prikazprvog=false;
+
+    StanjeIgre stanjeIgre;
+
+    RectangleShape gumbDvaIgraca;
+    RectangleShape gumbRacunalo;
+    Font font;
+    Text naslov, tekstDvaIgraca, tekstRacunalo, tekstPobjede, tekstPrvi;
+    Clock prvi;
+
+public:
+    Game() {
+        srand(time(nullptr));
+        stanjeIgre = izbornik;
+
+        p1.id = 1;
+        p2.id = 2;
+        currentplayer = rand() % 2 + 1;
+
+        font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+
+        naslov.setFont(font);
+        naslov.setString("CONNECT 4");
+        naslov.setCharacterSize(60);
+        naslov.setPosition(250, 100);
+
+        gumbDvaIgraca.setSize(Vector2f(450, 80));
+        gumbDvaIgraca.setPosition(150, 250);
+        gumbDvaIgraca.setFillColor(Color::Green);
+
+        gumbRacunalo.setSize(Vector2f(450, 80));
+        gumbRacunalo.setPosition(150, 360);
+        gumbRacunalo.setFillColor(Color::Red);
+
+        tekstDvaIgraca.setFont(font);
+        tekstDvaIgraca.setString("PLAYER VS PLAYER");
+        tekstDvaIgraca.setCharacterSize(40);
+        tekstDvaIgraca.setPosition(180, 265);
+
+        tekstRacunalo.setFont(font);
+        tekstRacunalo.setString("PLAYER VS BOT");
+        tekstRacunalo.setCharacterSize(40);
+        tekstRacunalo.setPosition(180, 375);
+
+        
+        tekstPobjede.setFont(font);
+        tekstPobjede.setCharacterSize(50);
+        tekstPobjede.setPosition(200, 300);
+
+        tekstPrvi.setFont(font);
+        tekstPrvi.setCharacterSize(60);
+        tekstPrvi.setPosition(180,350);
+    }
+
+    bool jeIzbornik() { return stanjeIgre == izbornik; }
+    Board& getboard() { return board; }
+
+    void obradiKlikIzbornika(Vector2i mis) {
+        if (gumbDvaIgraca.getGlobalBounds().contains(mis.x, mis.y)) {
+            stanjeIgre = DvaIgraca;
+            cout << "Unesi ime igraca 1: ";
+            cin >> p1.name;
+            cout << "Unesi ime igraca 2: ";
+            cin >> p2.name;
+            prikazprvog = true;
+            tekstPrvi.setString("Prvi igra: " + ((currentplayer == 1) ? p1.name : p2.name));
+            prvi.restart();
+        }
+        else if (gumbRacunalo.getGlobalBounds().contains(mis.x, mis.y)) {
+            stanjeIgre = JedanIgrac;
+            cout << "Unesi ime igraca: ";
+            cin >> p1.name;
+            p2.name = "BOT";
+            prikazprvog = true;
+            tekstPrvi.setString("Prvi igra: " + ((currentplayer == 1) ? p1.name : p2.name));
+            prvi.restart();
+        }
+    }
+
+    void handleclick(int x) {
+        if (stanjeIgre == izbornik || igragotova || pada) return;
+
+        stupac = x / CELL_WIDTH;
+        if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac)) {
+            board.pronadired(stupac, red);
+            pada = true;
+            animstupac = stupac;
+            animred = red;
+            animigrac = currentplayer;
+            animY = 0;
+        }
+    }
+
+    void update() {
+        if (prikazprvog) {
+            if (prvi.getElapsedTime().asSeconds() > 5.0f) {  
+                prikazprvog = false; 
+            }
+            else {
+                return; 
+            }
+        }
+
+
+        if (stanjeIgre == JedanIgrac && currentplayer == 2 && !pada && !igragotova) {
+            int s;
+            do { s = rand() % 7; } while (board.jelipun(s));
+            handleclick(s * CELL_WIDTH);
+        }
+
+        if (!pada) return;
+
+        float ciljaniY = animred * CELL_HEIGHT + PADDING;
+        if (animY < ciljaniY) animY += brzina;
+        else {
+            board.postavizeton(animred, animstupac, animigrac);
+            pada = false;
+
+            if (board.provjerapobjede(animigrac, animstupac, animred)) {
+                igragotova = true;
+                pobjednik = animigrac;
+                tekstPobjede.setString(
+                    (pobjednik == 1 ? p1.name : p2.name) + " JE POBIJEDIO");
+                tekstPobjede.setFillColor(pobjednik == 1 ? Color::Yellow : Color::Red);
+            }
+            else currentplayer = (currentplayer == 1 ? 2 : 1);
+        }
+    }
+
+    void draw(RenderWindow& w) {
+        if (stanjeIgre == izbornik) {
+            w.draw(naslov);
+            w.draw(gumbDvaIgraca);
+            w.draw(gumbRacunalo);
+            w.draw(tekstDvaIgraca);
+            w.draw(tekstRacunalo);
+            return;
+        }
+        if (prikazprvog) {
+            w.draw(tekstPrvi);
+            return;
+        }
+        
+        board.draw(w);
+        
+
+        if (pada) {
+            CircleShape c(45.f);
+            c.setPosition(animstupac * CELL_WIDTH + PADDING, animY);
+            c.setFillColor(animigrac == 1 ? Color::Yellow : Color::Red);
+            w.draw(c);
+        }
+
+        if (igragotova) w.draw(tekstPobjede);
+    }
+};
+
+int main() {
+    RenderWindow window(VideoMode(800, 700), "Connect Four");
+    window.setFramerateLimit(60);
+
+    Game game;
+
+    while (window.isOpen()) {
+        Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) window.close();
+            if (event.type == Event::MouseButtonPressed) {
+                if (game.jeIzbornik())
+                    game.obradiKlikIzbornika(Mouse::getPosition(window));
+                else
+                    game.handleclick(event.mouseButton.x);
+            }
+        }
+
+        game.update();
+
+        window.clear(Color::Black);
+        game.draw(window);
+        window.display();
+    }
+    return 0;
+}
