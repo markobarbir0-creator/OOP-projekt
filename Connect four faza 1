@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+#include <ctime>
 
 using namespace std;
 using namespace sf;
@@ -36,9 +37,7 @@ public:
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 CircleShape krug(45.f);
-                float X = j * CELL_WIDTH + PADDING;
-                float Y = i * CELL_HEIGHT + PADDING;
-                krug.setPosition(X, Y);
+                krug.setPosition(j * CELL_WIDTH + PADDING, i * CELL_HEIGHT + PADDING);
 
                 if (grid[i][j] == 0) krug.setFillColor(Color::White);
                 else if (grid[i][j] == 1) krug.setFillColor(Color::Yellow);
@@ -121,41 +120,15 @@ private:
     RectangleShape gumbDvaIgraca;
     RectangleShape gumbRacunalo;
     Font font;
-    Text naslov;
-    Text tekstDvaIgraca;
-    Text tekstRacunalo;
-
-    int procijeniPotez(int stupac, int igrac) {
-        int r;
-        if (!board.pronadired(stupac, r)) return -1000;
-        int bodovi = abs(3 - stupac);
-        if (board.provjerapobjede(igrac, stupac, r)) bodovi += 1000;
-        return bodovi;
-    }
-
-    int najboljiPotezRacunala() {
-        int najbolji = -10000;
-        int najboljiStupac = 0;
-
-        for (int j = 0; j < 7; j++) {
-            if (!board.jelipun(j)) {
-                int b = procijeniPotez(j, 2);
-                if (b > najbolji) {
-                    najbolji = b;
-                    najboljiStupac = j;
-                }
-            }
-        }
-        return najboljiStupac;
-    }
+    Text naslov, tekstDvaIgraca, tekstRacunalo, tekstPobjede, tekstNaRedu;
 
 public:
     Game() {
+        srand(time(nullptr));
         stanjeIgre = izbornik;
 
         p1.id = 1;
         p2.id = 2;
-
         currentplayer = rand() % 2 + 1;
 
         font.loadFromFile("C:/Windows/Fonts/arial.ttf");
@@ -182,11 +155,18 @@ public:
         tekstRacunalo.setString("1 IGRAČ");
         tekstRacunalo.setCharacterSize(40);
         tekstRacunalo.setPosition(350, 375);
+
+        tekstNaRedu.setFont(font);
+        tekstNaRedu.setCharacterSize(30);
+        tekstNaRedu.setPosition(20, 20);
+
+        tekstPobjede.setFont(font);
+        tekstPobjede.setCharacterSize(50);
+        tekstPobjede.setPosition(200, 300);
     }
 
-    bool jeIzbornik() {
-        return stanjeIgre == izbornik;
-    }
+    bool jeIzbornik() { return stanjeIgre == izbornik; }
+    Board& getboard() { return board; }
 
     void obradiKlikIzbornika(Vector2i mis) {
         if (gumbDvaIgraca.getGlobalBounds().contains(mis.x, mis.y)) {
@@ -200,19 +180,15 @@ public:
             stanjeIgre = JedanIgrac;
             cout << "Unesi ime igraca: ";
             cin >> p1.name;
-            p2.name = "BOT1";
+            p2.name = "BOT";
         }
     }
 
-    Board& getboard() {
-        return board;
-    }
-
     void handleclick(int x) {
-        if (stanjeIgre == izbornik) return;
+        if (stanjeIgre == izbornik || igragotova || pada) return;
 
         stupac = x / CELL_WIDTH;
-        if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac) && !pada) {
+        if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac)) {
             board.pronadired(stupac, red);
             pada = true;
             animstupac = stupac;
@@ -223,31 +199,37 @@ public:
     }
 
     void update() {
+        if (!igragotova && stanjeIgre != izbornik) {
+            tekstNaRedu.setString("Na redu je: " +
+                (currentplayer == 1 ? p1.name : p2.name));
+        }
+
         if (stanjeIgre == JedanIgrac && currentplayer == 2 && !pada && !igragotova) {
-            int s = najboljiPotezRacunala();
+            int s;
+            do { s = rand() % 7; } while (board.jelipun(s));
             handleclick(s * CELL_WIDTH);
         }
 
-        int ciljaniY = animred * CELL_HEIGHT + PADDING;
-        if (pada) {
-            if (animY < ciljaniY) animY += brzina;
-            else {
-                animY = ciljaniY;
-                board.postavizeton(animred, animstupac, animigrac);
-                pada = false;
+        if (!pada) return;
 
-                if (board.provjerapobjede(animigrac, animstupac, animred)) {
-                    igragotova = true;
-                    pobjednik = animigrac;
-                }
-                else {
-                    currentplayer = (currentplayer == 1) ? 2 : 1;
-                }
+        float ciljaniY = animred * CELL_HEIGHT + PADDING;
+        if (animY < ciljaniY) animY += brzina;
+        else {
+            board.postavizeton(animred, animstupac, animigrac);
+            pada = false;
+
+            if (board.provjerapobjede(animigrac, animstupac, animred)) {
+                igragotova = true;
+                pobjednik = animigrac;
+                tekstPobjede.setString(
+                    (pobjednik == 1 ? p1.name : p2.name) + " JE POBIJEDIO");
+                tekstPobjede.setFillColor(pobjednik == 1 ? Color::Yellow : Color::Red);
             }
+            else currentplayer = (currentplayer == 1 ? 2 : 1);
         }
     }
 
-    void gamedraw(RenderWindow& w) {
+    void draw(RenderWindow& w) {
         if (stanjeIgre == izbornik) {
             w.draw(naslov);
             w.draw(gumbDvaIgraca);
@@ -257,12 +239,17 @@ public:
             return;
         }
 
+        board.draw(w);
+        w.draw(tekstNaRedu);
+
         if (pada) {
-            CircleShape animkrug(45.f);
-            animkrug.setPosition(animstupac * CELL_WIDTH + PADDING, animY);
-            animkrug.setFillColor(animigrac == 1 ? Color::Yellow : Color::Red);
-            w.draw(animkrug);
+            CircleShape c(45.f);
+            c.setPosition(animstupac * CELL_WIDTH + PADDING, animY);
+            c.setFillColor(animigrac == 1 ? Color::Yellow : Color::Red);
+            w.draw(c);
         }
+
+        if (igragotova) w.draw(tekstPobjede);
     }
 };
 
@@ -275,9 +262,7 @@ int main() {
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
-            if (event.type == Event::Closed)
-                window.close();
-
+            if (event.type == Event::Closed) window.close();
             if (event.type == Event::MouseButtonPressed) {
                 if (game.jeIzbornik())
                     game.obradiKlikIzbornika(Mouse::getPosition(window));
@@ -289,11 +274,8 @@ int main() {
         game.update();
 
         window.clear(Color::White);
-        game.getboard().draw(window);
-        game.gamedraw(window);
+        game.draw(window);
         window.display();
     }
-
     return 0;
 }
-
