@@ -94,12 +94,21 @@ public:
     void postavizeton(int red, int stupac, int igrac) {
         grid[red][stupac] = igrac;
     }
+    void reset()
+    {
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < columns; j++)
+                grid[i][j] = 0;
+    }
 };
 
 enum StanjeIgre {
     izbornik,
     DvaIgraca,
-    JedanIgrac
+    JedanIgrac,
+    Menu,
+    Exit,
+    Restart
 };
 
 class Game {
@@ -120,9 +129,12 @@ private:
 
     RectangleShape gumbDvaIgraca;
     RectangleShape gumbRacunalo;
+    RectangleShape gumbExit;
+    RectangleShape gumbRestart;
     Font font;
     Text naslov, tekstDvaIgraca, tekstRacunalo, tekstPobjede, tekstPrvi;
     Clock prvi;
+    Text tekstRestart, tekstExit;
 
 public:
     Game() {
@@ -138,7 +150,7 @@ public:
         naslov.setFont(font);
         naslov.setString("CONNECT 4");
         naslov.setCharacterSize(60);
-        naslov.setPosition(250, 100);
+        naslov.setPosition(200, 100);
 
         gumbDvaIgraca.setSize(Vector2f(450, 80));
         gumbDvaIgraca.setPosition(150, 250);
@@ -147,6 +159,15 @@ public:
         gumbRacunalo.setSize(Vector2f(450, 80));
         gumbRacunalo.setPosition(150, 360);
         gumbRacunalo.setFillColor(Color::Red);
+
+        gumbExit.setSize(Vector2f(450, 80));
+        gumbExit.setPosition(150, 250);
+        gumbExit.setFillColor(Color::Green);
+
+        gumbRestart.setSize(Vector2f(450, 80));
+        gumbRestart.setPosition(150, 360);
+        gumbRestart.setFillColor(Color::Red);
+
 
         tekstDvaIgraca.setFont(font);
         tekstDvaIgraca.setString("PLAYER VS PLAYER");
@@ -158,10 +179,19 @@ public:
         tekstRacunalo.setCharacterSize(40);
         tekstRacunalo.setPosition(180, 375);
 
-        
+        tekstRestart.setFont(font);
+        tekstRestart.setString("RESTART");
+        tekstRestart.setCharacterSize(40);
+        tekstRestart.setPosition(180, 375);
+
+        tekstExit.setFont(font);
+        tekstExit.setString("EXIT");
+        tekstExit.setCharacterSize(40);
+        tekstExit.setPosition(180, 265);
+
         tekstPobjede.setFont(font);
         tekstPobjede.setCharacterSize(50);
-        tekstPobjede.setPosition(200, 300);
+        tekstPobjede.setPosition(200, 100);
 
         tekstPrvi.setFont(font);
         tekstPrvi.setCharacterSize(60);
@@ -169,7 +199,22 @@ public:
     }
 
     bool jeIzbornik() { return stanjeIgre == izbornik; }
+    bool jeMenu() { return stanjeIgre == Menu; }
+    bool jeIgraGotova() { return igragotova; }
+    StanjeIgre getStanje() { return stanjeIgre; }
+    void setStanje(StanjeIgre s) { stanjeIgre = s; }
+
+
     Board& getboard() { return board; }
+    void obradiKlikEnd(Vector2i mis) {
+        if (gumbRestart.getGlobalBounds().contains(mis.x, mis.y)) {
+            stanjeIgre = Restart;
+
+        }
+        else if (gumbExit.getGlobalBounds().contains(mis.x, mis.y)) {
+            stanjeIgre = Exit;
+        }
+    }
 
     void obradiKlikIzbornika(Vector2i mis) {
         if (gumbDvaIgraca.getGlobalBounds().contains(mis.x, mis.y)) {
@@ -194,7 +239,7 @@ public:
     }
 
     void handleclick(int x) {
-        if (stanjeIgre == izbornik || igragotova || pada) return;
+        if ((stanjeIgre == izbornik || stanjeIgre==Menu) || igragotova || pada) return;
 
         stupac = x / CELL_WIDTH;
         if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac)) {
@@ -242,6 +287,15 @@ public:
             else currentplayer = (currentplayer == 1 ? 2 : 1);
         }
     }
+    void resetGame()
+    {
+        board.reset();
+        igragotova = false;
+        pada = false;
+        prikazprvog = false;
+        currentplayer = rand() % 2 + 1;
+    }
+
 
     void draw(RenderWindow& w) {
         if (stanjeIgre == izbornik) {
@@ -256,9 +310,18 @@ public:
             w.draw(tekstPrvi);
             return;
         }
-        
-        board.draw(w);
-        
+
+        if (!igragotova) {
+            board.draw(w);
+        }
+        else {
+            w.draw(tekstPobjede);
+            w.draw(gumbRestart);
+            w.draw(gumbExit);
+            w.draw(tekstRestart);
+            w.draw(tekstExit);
+        }
+
 
         if (pada) {
             CircleShape c(45.f);
@@ -267,13 +330,14 @@ public:
             w.draw(c);
         }
 
-        if (igragotova) w.draw(tekstPobjede);
+
     }
 };
 
 int main() {
     RenderWindow window(VideoMode(800, 700), "Connect Four");
     window.setFramerateLimit(60);
+   
 
     Game game;
 
@@ -281,13 +345,31 @@ int main() {
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) window.close();
-            if (event.type == Event::MouseButtonPressed) {
+            if (event.type == Event::MouseButtonPressed &&
+                event.mouseButton.button == Mouse::Left)
+            {
+                Vector2i mis = Mouse::getPosition(window);
+
                 if (game.jeIzbornik())
-                    game.obradiKlikIzbornika(Mouse::getPosition(window));
+                    game.obradiKlikIzbornika(mis);
+                else if (game.jeIgraGotova())
+                    game.obradiKlikEnd(mis);
                 else
                     game.handleclick(event.mouseButton.x);
             }
+
         }
+        if (game.getStanje() == Restart)
+        {
+            game.resetGame();
+            game.setStanje(izbornik);
+        }
+
+        if (game.getStanje() == Exit)
+        {
+            window.close();
+        }
+
 
         game.update();
 
