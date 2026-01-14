@@ -1,19 +1,15 @@
-#ifndef GAME_H
-#define GAME_H
-
-#include "Board.h"
-#include "Player.h"
+#pragma once
 #include <SFML/Graphics.hpp>
-#include <ctime>
+#include "Board.h"
+#include <string>
 using namespace sf;
+using namespace std;
 
-enum StanjeIgre {
-    izbornik,
-    DvaIgraca,
-    JedanIgrac,
-    Menu,
-    Exit,
-    Restart
+enum StanjeIgre { izbornik, Menu, DvaIgraca, JedanIgrac, Restart, Exit };
+
+struct Player {
+    int id;
+    string name;
 };
 
 class Game {
@@ -22,42 +18,30 @@ private:
     Player p1, p2;
     int currentplayer;
     int stupac, red;
-    bool pada;
     int animstupac, animred, animigrac;
-    float animY;
-    float brzina;
-    bool igragotova;
-    int pobjednik;
-    bool prikazprvog;
-
+    bool igragotova, pada, prikazprvog;
+    float animY, brzina;
     StanjeIgre stanjeIgre;
-
-    RectangleShape gumbDvaIgraca;
-    RectangleShape gumbRacunalo;
-    RectangleShape gumbExit;
-    RectangleShape gumbRestart;
-    Font font;
-    Text naslov, tekstDvaIgraca, tekstRacunalo, tekstPobjede, tekstPrvi;
+    int pobjednik;
     Clock prvi;
-    Text tekstRestart, tekstExit;
+    Font font;
+    RectangleShape gumbDvaIgraca, gumbRacunalo, gumbRestart, gumbExit;
+    Text naslov, tekstDvaIgraca, tekstRacunalo, tekstRestart, tekstExit, tekstPrvi, tekstPobjede;
 
 public:
     Game();
-
     bool jeIzbornik();
     bool jeMenu();
     bool jeIgraGotova();
     StanjeIgre getStanje();
     void setStanje(StanjeIgre s);
-
     Board& getboard();
     void obradiKlikEnd(Vector2i mis);
     void obradiKlikIzbornika(Vector2i mis);
     void handleclick(int x);
     void update();
     void resetGame();
+    bool mozePobjedit(int igrac, int stupac);
+    int odaberiNajboljiStupacAI();
     void draw(RenderWindow& w);
 };
-
-#endif
-

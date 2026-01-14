@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 using namespace std;
+using namespace sf;
 
 const float CELL_WIDTH = 800.0f / 7;
 const float CELL_HEIGHT = 700.0f / 6;
@@ -67,7 +68,7 @@ Game::Game() {
 
     pada = false;
     animY = 0;
-    brzina = CELL_HEIGHT / (0.5f * 60);
+    brzina = CELL_HEIGHT / (5.f * 60.f);
     igragotova = false;
     prikazprvog = false;
 }
@@ -85,6 +86,30 @@ void Game::obradiKlikEnd(Vector2i mis) {
         stanjeIgre = Restart;
     else if (gumbExit.getGlobalBounds().contains(mis.x, mis.y))
         stanjeIgre = Exit;
+}
+
+bool Game::mozePobjedit(int igrac, int stupac) {
+    int r;
+    if (!board.pronadired(stupac, r)) return false;
+    board.postavizeton(r, stupac, igrac);
+    bool win = board.provjerapobjede(igrac, stupac, r);
+    board.uklonizeton(r, stupac);
+    return win;
+}
+
+int Game::odaberiNajboljiStupacAI() {
+    for (int s = 0; s < 7; s++)
+        if (!board.jelipun(s) && mozePobjedit(2, s))
+            return s;
+
+    for (int s = 0; s < 7; s++)
+        if (!board.jelipun(s) && mozePobjedit(1, s))
+            return s;
+
+    int s;
+    do { s = rand() % 7; } while (board.jelipun(s));
+    s = odaberiNajboljiStupacAI();
+    return s;
 }
 
 void Game::obradiKlikIzbornika(Vector2i mis) {
