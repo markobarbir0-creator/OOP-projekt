@@ -1,16 +1,15 @@
-#pragma once
+﻿#pragma once
 #include <SFML/Graphics.hpp>
-#include "Board.h"
 #include <string>
+#include "Board.h"
+#include "Player.h"
+
 using namespace sf;
 using namespace std;
 
-enum StanjeIgre { izbornik, Menu, DvaIgraca, JedanIgrac, Restart, Exit };
 
-struct Player {
-    int id;
-    string name;
-};
+
+enum StanjeIgre { izbornik, Menu, JedanIgrac, DvaIgraca, Restart, Exit };
 
 class Game {
 private:
@@ -18,18 +17,28 @@ private:
     Player p1, p2;
     int currentplayer;
     int stupac, red;
+    bool pada;
     int animstupac, animred, animigrac;
-    bool igragotova, pada, prikazprvog;
-    float animY, brzina;
-    StanjeIgre stanjeIgre;
+    float animY;
+    float brzina;
+    bool igragotova;
     int pobjednik;
-    Clock prvi;
+    bool prikazprvog;
+    StanjeIgre stanjeIgre;
+    RectangleShape gumbDvaIgraca, gumbRacunalo, gumbExit, gumbRestart;
     Font font;
-    RectangleShape gumbDvaIgraca, gumbRacunalo, gumbRestart, gumbExit;
-    Text naslov, tekstDvaIgraca, tekstRacunalo, tekstRestart, tekstExit, tekstPrvi, tekstPobjede;
+    Text naslov, tekstDvaIgraca, tekstRacunalo, tekstPobjede, tekstPrvi;
+    Text tekstRestart, tekstExit;
+    Text tekstUnosImena;
+    Clock prvi;
+   
+    int fazaUnosa;
+    bool mozePobjedit(int igrac, int stupac);
+    int odaberiNajboljiStupacAI();
 
 public:
     Game();
+    string bufferIme;
     bool jeIzbornik();
     bool jeMenu();
     bool jeIgraGotova();
@@ -41,7 +50,6 @@ public:
     void handleclick(int x);
     void update();
     void resetGame();
-    bool mozePobjedit(int igrac, int stupac);
-    int odaberiNajboljiStupacAI();
+    void potvrdiIme();
     void draw(RenderWindow& w);
 };

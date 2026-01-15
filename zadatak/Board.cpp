@@ -1,13 +1,14 @@
 #include "Board.h"
 using namespace sf;
 
-const float CELL_WIDTH = 800.0f / 7;
-const float CELL_HEIGHT = 700.0f / 6;
+const float CELL_WIDTH =800 / 7;
+const float CELL_HEIGHT = 700/ 6;
 const float PADDING = 10.f;
+
 
 Board::Board() {
     grid.resize(rows, vector<int>(columns, 0));
-    Boardshape.setSize(Vector2f(800.f, 700.f));
+    Boardshape.setSize(Vector2f(800,700));
     Boardshape.setFillColor(Color::Blue);
 }
 

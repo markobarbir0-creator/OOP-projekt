@@ -1,16 +1,13 @@
-#include "Game.h"
-#include <iostream>
+﻿#include "Game.h"
 #include <cstdlib>
-using namespace std;
-using namespace sf;
-
-const float CELL_WIDTH = 800.0f / 7;
-const float CELL_HEIGHT = 700.0f / 6;
+#include <ctime>
+const float CELL_WIDTH = 800 / 7;
+const float CELL_HEIGHT = 700 / 6;
 const float PADDING = 10.f;
-
 Game::Game() {
     srand(time(nullptr));
     stanjeIgre = izbornik;
+
     p1.id = 1;
     p2.id = 2;
     currentplayer = rand() % 2 + 1;
@@ -66,11 +63,16 @@ Game::Game() {
     tekstPrvi.setCharacterSize(60);
     tekstPrvi.setPosition(180, 350);
 
+    tekstUnosImena.setFont(font);
+    tekstUnosImena.setCharacterSize(40);
+    tekstUnosImena.setFillColor(Color::White);
+    tekstUnosImena.setPosition(150, 500);
+
     pada = false;
-    animY = 0;
-    brzina = CELL_HEIGHT / (5.f * 60.f);
     igragotova = false;
     prikazprvog = false;
+    fazaUnosa = 0;
+    bufferIme.clear();
 }
 
 bool Game::jeIzbornik() { return stanjeIgre == izbornik; }
@@ -79,13 +81,40 @@ bool Game::jeIgraGotova() { return igragotova; }
 StanjeIgre Game::getStanje() { return stanjeIgre; }
 void Game::setStanje(StanjeIgre s) { stanjeIgre = s; }
 
-Board& Game::getboard() { return board; }
-
 void Game::obradiKlikEnd(Vector2i mis) {
     if (gumbRestart.getGlobalBounds().contains(mis.x, mis.y))
         stanjeIgre = Restart;
     else if (gumbExit.getGlobalBounds().contains(mis.x, mis.y))
         stanjeIgre = Exit;
+}
+
+void Game::obradiKlikIzbornika(Vector2i mis) {
+    if (fazaUnosa > 0) return;
+
+    if (gumbDvaIgraca.getGlobalBounds().contains(mis.x, mis.y)) {
+        fazaUnosa = 1;
+        bufferIme.clear();
+    }
+    else if (gumbRacunalo.getGlobalBounds().contains(mis.x, mis.y)) {
+        fazaUnosa = 1;
+        p2.name = "BOT";
+        bufferIme.clear();
+    }
+}
+
+void Game::handleclick(int x) {
+    if ((stanjeIgre == izbornik || stanjeIgre == Menu) || igragotova || pada)
+        return;
+
+    stupac = x / CELL_WIDTH;
+    if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac)) {
+        board.pronadired(stupac, red);
+        pada = true;
+        animstupac = stupac;
+        animred = red;
+        animigrac = currentplayer;
+        animY = 0;
+    }
 }
 
 bool Game::mozePobjedit(int igrac, int stupac) {
@@ -108,62 +137,26 @@ int Game::odaberiNajboljiStupacAI() {
 
     int s;
     do { s = rand() % 7; } while (board.jelipun(s));
-    s = odaberiNajboljiStupacAI();
     return s;
-}
-
-void Game::obradiKlikIzbornika(Vector2i mis) {
-    if (gumbDvaIgraca.getGlobalBounds().contains(mis.x, mis.y)) {
-        stanjeIgre = DvaIgraca;
-        cout << "Unesi ime igraca 1: ";
-        cin >> p1.name;
-        cout << "Unesi ime igraca 2: ";
-        cin >> p2.name;
-        prikazprvog = true;
-        tekstPrvi.setString("Prvi igra: " + ((currentplayer == 1) ? p1.name : p2.name));
-        prvi.restart();
-    }
-    else if (gumbRacunalo.getGlobalBounds().contains(mis.x, mis.y)) {
-        stanjeIgre = JedanIgrac;
-        cout << "Unesi ime igraca: ";
-        cin >> p1.name;
-        p2.name = "BOT";
-        prikazprvog = true;
-        tekstPrvi.setString("Prvi igra: " + ((currentplayer == 1) ? p1.name : p2.name));
-        prvi.restart();
-    }
-}
-
-void Game::handleclick(int x) {
-    if ((stanjeIgre == izbornik || stanjeIgre == Menu) || igragotova || pada) return;
-
-    stupac = x / CELL_WIDTH;
-    if (stupac >= 0 && stupac < 7 && !board.jelipun(stupac)) {
-        board.pronadired(stupac, red);
-        pada = true;
-        animstupac = stupac;
-        animred = red;
-        animigrac = currentplayer;
-        animY = 0;
-    }
 }
 
 void Game::update() {
     if (prikazprvog) {
-        if (prvi.getElapsedTime().asSeconds() > 5.0f) prikazprvog = false;
+        if (prvi.getElapsedTime().asSeconds() > 5.f)
+            prikazprvog = false;
         else return;
     }
 
     if (stanjeIgre == JedanIgrac && currentplayer == 2 && !pada && !igragotova) {
-        int s;
-        do { s = rand() % 7; } while (board.jelipun(s));
+        int s = odaberiNajboljiStupacAI();
         handleclick(s * CELL_WIDTH);
     }
 
     if (!pada) return;
 
     float ciljaniY = animred * CELL_HEIGHT + PADDING;
-    if (animY < ciljaniY) animY += brzina;
+    if (animY < ciljaniY)
+        animY += CELL_HEIGHT / (0.3f * 60.f);
     else {
         board.postavizeton(animred, animstupac, animigrac);
         pada = false;
@@ -171,10 +164,12 @@ void Game::update() {
         if (board.provjerapobjede(animigrac, animstupac, animred)) {
             igragotova = true;
             pobjednik = animigrac;
-            tekstPobjede.setString((pobjednik == 1 ? p1.name : p2.name) + " JE POBIJEDIO");
-            tekstPobjede.setFillColor(pobjednik == 1 ? Color::Yellow : Color::Red);
+            tekstPobjede.setString(
+                (pobjednik == 1 ? p1.name : p2.name) + " JE POBIJEDIO"
+            );
         }
-        else currentplayer = (currentplayer == 1 ? 2 : 1);
+        else
+            currentplayer = (currentplayer == 1 ? 2 : 1);
     }
 }
 
@@ -186,6 +181,28 @@ void Game::resetGame() {
     currentplayer = rand() % 2 + 1;
 }
 
+void Game::potvrdiIme() {
+    if (fazaUnosa == 1) {
+        p1.name = bufferIme;
+        bufferIme.clear();
+        fazaUnosa = (p2.name == "BOT" ? 0 : 2);
+    }
+    else if (fazaUnosa == 2) {
+        p2.name = bufferIme;
+        bufferIme.clear();
+        fazaUnosa = 0;
+    }
+
+    if (fazaUnosa == 0) {
+        stanjeIgre = (p2.name == "BOT" ? JedanIgrac : DvaIgraca);
+        prikazprvog = true;
+        prvi.restart();
+        tekstPrvi.setString(
+            "PRVI IGRA: " + (currentplayer == 1 ? p1.name : p2.name)
+        );
+    }
+}
+
 void Game::draw(RenderWindow& w) {
     if (stanjeIgre == izbornik) {
         w.draw(naslov);
@@ -193,6 +210,14 @@ void Game::draw(RenderWindow& w) {
         w.draw(gumbRacunalo);
         w.draw(tekstDvaIgraca);
         w.draw(tekstRacunalo);
+
+        if (fazaUnosa > 0) {
+            tekstUnosImena.setString(
+                (fazaUnosa == 1 ? "PLAYER 1: " : "PLAYER 2: ")
+                + bufferIme
+            );
+            w.draw(tekstUnosImena);
+        }
         return;
     }
 
@@ -201,7 +226,8 @@ void Game::draw(RenderWindow& w) {
         return;
     }
 
-    if (!igragotova) board.draw(w);
+    if (!igragotova)
+        board.draw(w);
     else {
         w.draw(tekstPobjede);
         w.draw(gumbRestart);

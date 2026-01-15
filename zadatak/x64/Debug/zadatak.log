@@ -1,5 +1,5 @@
 ﻿  Game.cpp
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(12,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(8,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(85,58): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
 C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(85,58): warning C4244:         with
 C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(85,58): warning C4244:         [
@@ -36,42 +36,42 @@ C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(87,53): warning C4
 C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(87,53): warning C4244:         [
 C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(87,53): warning C4244:             T=float
 C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(87,53): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:         with
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:             T=int
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:         and
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:             T=float
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,60): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:         with
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:             T=int
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:         and
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:             T=float
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(116,53): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:         with
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:             T=int
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:         and
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:             T=float
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,64): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:         with
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:             T=int
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:         and
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:         [
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:             T=float
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(126,57): warning C4244:         ]
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(140,16): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(160,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:         with
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:             T=int
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:         and
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:             T=float
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,60): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:         with
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:             T=int
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:         and
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:             T=float
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(94,53): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:         with
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:             T=int
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:         and
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:             T=float
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,64): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:         with
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:             T=int
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:         and
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:         [
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:             T=float
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(98,57): warning C4244:         ]
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(109,16): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\MarkoBarbir\Documents\sfml1\zadatak\zadatak\Game.cpp(152,23): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   zadatak.vcxproj -> C:\Users\MarkoBarbir\Documents\sfml1\zadatak\x64\Debug\zadatak.exe
