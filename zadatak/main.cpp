@@ -49,7 +49,7 @@ int main() {
         if (game.getStanje() == Exit)
             window.close();
 
-        // Update logike igre
+       
         game.update();
 
         window.clear(Color::Black);

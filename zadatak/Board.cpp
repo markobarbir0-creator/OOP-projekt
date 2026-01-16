@@ -1,10 +1,6 @@
 #include "Board.h"
 using namespace sf;
 
-const float CELL_WIDTH =800 / 7;
-const float CELL_HEIGHT = 700/ 6;
-const float PADDING = 10.f;
-
 
 Board::Board() {
     grid.resize(rows, vector<int>(columns, 0));
@@ -26,7 +22,7 @@ void Board::draw(RenderWindow& window) {
     }
 }
 
-bool Board::jelipun(int stupac) { return grid[0][stupac] != 0; }
+bool Board::jelipun(int stupac)const { return grid[0][stupac] != 0; }
 
 bool Board::pronadired(int stupac, int& red) {
     for (int i = rows - 1; i >= 0; i--) {
@@ -64,4 +60,17 @@ bool Board::provjerapobjede(int igrac, int stupac, int red) {
 
 void Board::postavizeton(int red, int stupac, int igrac) { grid[red][stupac] = igrac; }
 void Board::uklonizeton(int red, int stupac) { grid[red][stupac] = 0; }
-void Board::reset() { for (int i = 0; i < rows; i++) for (int j = 0; j < columns; j++) grid[i][j] = 0; }
+void Board::reset() {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            grid[i][j] = 0;
+        }       
+    }
+}
+bool Board::punaPloca() const {
+    for (int s = 0; s < columns; s++) {
+        if (!jelipun(s))
+            return false;
+    }
+    return true;
+}

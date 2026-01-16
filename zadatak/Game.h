@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef GAME_H
+#define GAME_H
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Board.h"
@@ -53,3 +54,4 @@ public:
     void potvrdiIme();
     void draw(RenderWindow& w);
 };
+#endif

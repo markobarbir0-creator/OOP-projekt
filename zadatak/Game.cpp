@@ -1,9 +1,7 @@
 ﻿#include "Game.h"
 #include <cstdlib>
 #include <ctime>
-const float CELL_WIDTH = 800 / 7;
-const float CELL_HEIGHT = 700 / 6;
-const float PADDING = 10.f;
+
 Game::Game() {
     srand(time(nullptr));
     stanjeIgre = izbornik;
@@ -103,7 +101,7 @@ void Game::obradiKlikIzbornika(Vector2i mis) {
 }
 
 void Game::handleclick(int x) {
-    if ((stanjeIgre == izbornik || stanjeIgre == Menu) || igragotova || pada)
+    if ((stanjeIgre == izbornik || stanjeIgre == Menu) || igragotova || pada || prikazprvog)
         return;
 
     stupac = x / CELL_WIDTH;
@@ -152,11 +150,14 @@ void Game::update() {
         handleclick(s * CELL_WIDTH);
     }
 
-    if (!pada) return;
+    if (!pada) {
+        return;
+    }
 
     float ciljaniY = animred * CELL_HEIGHT + PADDING;
-    if (animY < ciljaniY)
+    if (animY < ciljaniY) {
         animY += CELL_HEIGHT / (0.3f * 60.f);
+    }
     else {
         board.postavizeton(animred, animstupac, animigrac);
         pada = false;
@@ -168,10 +169,17 @@ void Game::update() {
                 (pobjednik == 1 ? p1.name : p2.name) + " JE POBIJEDIO"
             );
         }
-        else
+        else if (board.punaPloca()) {
+            igragotova = true;
+            pobjednik = 0;
+            tekstPobjede.setString("IZJEDNACENO!");
+        }
+        else {
             currentplayer = (currentplayer == 1 ? 2 : 1);
+        }
     }
 }
+    
 
 void Game::resetGame() {
     board.reset();
